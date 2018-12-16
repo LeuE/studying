@@ -1,0 +1,43 @@
+#include <stdio.h>
+#define MAXN 20
+
+void CountOff( int n, int m, int out[] );
+
+int main()
+{
+    int out[MAXN], n, m;
+    int i;
+
+    scanf("%d %d", &n, &m);
+    CountOff( n, m, out );   
+    for ( i = 0; i < n; i++ )
+        printf("%d ", out[i]);
+    printf("\n");
+
+    return 0;
+}
+void CountOff( int n, int m, int out[] )
+{
+  int j=0,i,y=0,x,a[20000],count=0;
+  for(i=0;i<n;i++)
+  {
+    a[i]=i+1;
+  }
+while(count<n)
+{
+
+if(a[j]!=0)x++;//后移m次，判断报m的人，跳过已经报过数的人
+if(x==m)
+{
+  out[j]=++y;//把原数列出列次序保存到out[i-1]
+  a[j]=0;//出列
+  x=0;//重新判断m
+  count++;//出列次数判断
+  
+  
+}
+
+  j++;//若上个条件不成立，则一直进行（while）
+ if(j==n)j-=n; //超过则返回0
+}
+}

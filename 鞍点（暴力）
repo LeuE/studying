@@ -1,0 +1,36 @@
+#include<stdio.h>
+int main()
+{
+	int b, m, n, i, j;
+	int a[6][6];
+	scanf("%d", &n);
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			scanf("%d", &a[i][j]);
+		}
+	}
+	int flag;
+	int max;
+	int cnt1, cnt2;		
+	for (i = 0; i < n; i++) {
+		flag = 0;
+		max = a[i][0];
+		cnt1 = i;
+		cnt2 = 0;
+		for (j = 1; j < n; j++) {
+			if (max < a[i][j]) {
+				max = a[i][j];
+				cnt2 = j;
+			}
+		}
+		for (int k = 0; k < n; k++) {
+			if (a[k][cnt2] < max) {
+				flag = 1;
+			}
+		}
+		if (flag == 0) {
+			printf("%d %d", i, cnt2);
+			break;
+		}
+	
+	}

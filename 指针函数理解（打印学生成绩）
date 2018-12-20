@@ -1,0 +1,19 @@
+#include <stdio.h>
+int main()
+
+{
+	int score[][4] = { {1,2,3,4} ,{5,6,7,8} },n,*p,i;
+	n = 1;
+	int *search(int(*point)[4], int n);
+	p=search(score, n);
+	for (i = 0; i < 4; i++)
+	{
+		printf("%d ", *(p+i));
+	}
+}
+int *search(int(*point)[4], int n)
+{
+	int *pt;
+	pt = *(point + n);
+	return(pt);
+}

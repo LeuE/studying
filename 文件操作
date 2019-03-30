@@ -58,3 +58,7 @@ int main()
 	}
 	return 0;
 }
+/*
+问题：stream！=nullptr
+括号错误，空文件；
+nullptr：空指针常量

@@ -62,3 +62,4 @@ int main()
 问题：stream！=nullptr
 括号错误，空文件；
 nullptr：空指针常量
+常数0既是整数常量，也是空指针常量

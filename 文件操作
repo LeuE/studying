@@ -9,7 +9,7 @@ void save()
 {
 	FILE *fp;
 	int i;
-	if ((fp = fopen("233.dat", "wb")) == NULL)
+	if ((fp = fopen("233.dat", "wb")) == NULL)//if ((fp = fopen("233.dat", "wb") == NULL)）：后者优先级高，返回0；fp无指向
 	{
 		printf("errorr!");
 		return;

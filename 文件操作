@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node
+{
+	int data;
+}a[3],b[3];
+
+void save()
+{
+	FILE *fp;
+	int i;
+	if ((fp = fopen("233.dat", "wb")) == NULL)
+	{
+		printf("errorr!");
+		return;
+	}
+	for (i = 0; i < 3; i++)
+	{
+		if (fwrite(&a[i], sizeof(struct Node), 1, fp) != 1)
+		{
+			printf("errorrrrr!");
+		}
+
+	}
+		fclose(fp);
+}
+void load()
+{
+	FILE *fp;
+	if ((fp = fopen("233.dat", "rb")) == NULL)
+	{
+		printf("errorrrrr!");
+			return;
+
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		if (fread(&b[i], sizeof(struct Node), 1, fp) != 1)
+			printf("errorr!");
+	}
+	fclose(fp);
+}
+int main()
+{
+	int i;
+
+	printf("inter 3 numbers:\n");
+	for (i = 0; i < 3; i++)
+	{
+		scanf("%d", &a[i].data);
+	}
+
+	save();
+	load();
+	for (i = 0; i < 3; i++)
+	{
+		printf("%d ", b[i].data);
+	}
+	return 0;
+}

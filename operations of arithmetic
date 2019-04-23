@@ -1,0 +1,600 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include <string.h>
+struct zhanghao
+{
+	char haoma[20];
+	char mima[20];
+}p;
+char zhanggh[20] = { 0 };
+void registerr();
+int login();
+int question();
+void wrong_question(int a,int b,int c,char x,char y);//保存错题
+void mark_shuchu(float score_sum);
+void save_zhuce(struct zhanghao zhmm);
+void load_cuoti();
+int load_zhuce_zhuce(struct zhanghao haoma);
+int load_zhuce_denglu(struct zhanghao haoma);
+int caidan1();
+int caidan2();
+void que();
+int log_in = 0;
+int main()//函数切换
+{
+	FILE *fp;
+	int shuru1, shuru2,panduan=1;
+	shuru1 = caidan1();
+	switch (shuru1)
+	{
+	case 1:registerr(); break;
+	case 2:panduan=login(); break;
+	default:return 0;
+
+	}
+	if (panduan == 0)return 0;
+	shuru2 = caidan2();
+	switch (shuru2)
+	{
+	case 1: que(); break;
+	case 2:load_cuoti(); break;//传入什么？？？(错题集）
+	default:return 0;
+
+	}
+	return 0;
+}
+void registerr()
+{
+	struct zhanghao zh;
+	FILE *fp;
+	int flag;
+	printf("注册\n");
+	printf("请输入账号：");
+	scanf("%s", &zh.haoma);
+
+	//加载注册表并遍历
+	flag = load_zhuce_zhuce(zh);
+	while (flag)
+	{
+		printf("已被注册，请重新输入！\n");
+		system("pause");
+		system("cls");
+		printf("请输入账号：");
+		scanf("%s", &zh.haoma);
+		flag = load_zhuce_zhuce(zh);
+
+	}
+
+	printf("请输入密码:");
+	scanf("%s", &zh.mima);
+	save_zhuce(zh);
+	printf("注册成功！\n");
+	for (int i = 0; i < 20; i++)
+	{
+		zhanggh[i] = zh.haoma[i];
+	}
+	strcat(zhanggh, ".txt");
+	if ((fp = fopen(zhanggh, "wb")) == NULL)
+	{
+		printf("错题本创建错误！");
+	}
+	system("pause");
+	system("cls");
+}
+//正确
+int login()
+{
+	struct zhanghao zh;
+	int flag,n=2;
+		printf("登陆\n");
+		printf("请输入账号：");
+		scanf("%s", &zh.haoma);
+		printf("请输入密码：");
+		scanf("%s", &zh.mima);
+		flag = load_zhuce_denglu(zh);
+	while (n)
+	{
+
+		if (flag==1)//同时相等
+		{
+			system("cls");
+			printf("登陆成功！\n");
+			for (int i = 0; i < 20; i++)
+			{
+				zhanggh[i] = zh.haoma[i];
+			}
+			strcat(zhanggh, ".txt");
+			return 1;
+		}
+		else
+		{
+			printf("账号或密码错误，请重新输入\n");
+			printf("你还有%d次机会\n", n--);
+			printf("请输入账号：");
+			scanf("%s", &zh.haoma);
+			printf("请输入密码：");
+			scanf("%s", &zh.mima);
+			flag = load_zhuce_denglu(zh);
+
+		}
+
+	}
+	if (flag == 1)//同时相等
+	{
+		system("cls");
+		printf("登陆成功！\n");
+		for (int i = 0; i < 20; i++)
+		{
+			zhanggh[i] = zh.haoma[i];
+		}
+		strcat(zhanggh, ".txt");
+		return 1;
+	}
+	printf("失败次数过多，自动退出程序！！！");
+	return 0;
+
+}
+
+//得到题目数目
+void que()
+{
+	int num, score_sum = 0, score_1;
+	float score_final;
+	printf("我想要做几题？？？");
+	scanf("%d", &num);
+	for (int i = 0; i < num; i++)
+	{
+		score_1 = question();
+		score_sum += score_1;
+	}
+	score_final = score_sum / num;
+	mark_shuchu(score_final);
+
+}
+//出一道题+判断单题得分，返回单题得分
+int question()
+{
+
+	//得到随机数:两个100以内+符号
+	int rand_num1, rand_num2, rand_fuhao, answer, flag = 1, score_1;
+	srand(time(0));
+	rand_fuhao = rand() % 4;
+	rand_num2 = rand() % 101;
+	rand_num1 = rand() % 101;
+	//反别计算加减乘除
+	//加
+	if (rand_fuhao == 0)
+	{
+		while (flag)
+		{
+			if (rand_num1 + rand_num2 <= 100)
+			{
+				flag = 0;
+			}
+			else
+			{
+				rand_num2 = rand() % 101;
+				rand_num1 = rand() % 101;
+			}
+		}
+		printf("%d + %d = ?\n", rand_num1, rand_num2);
+
+		//得到答案并判断得分
+		printf("答案为：");
+		scanf("%d", &answer);
+		if (answer == rand_num1 + rand_num2)
+		{
+			printf("回答正确，智商+1！\n");
+			return 100;
+		}
+		else
+		{
+			int a, b, c;
+			char x, y;
+			a = rand_num1; b = rand_num2; c = rand_num1 + rand_num2; x = '+'; y = '=';
+			wrong_question(a, b, c, x, y);
+			printf("回答错误，还有一次机会！\n你的罪恶已经记录\n答案为：");
+			scanf("%d", &answer);
+			if (answer == rand_num1 + rand_num2)
+			{
+				printf("回答正确，智商+0.5！\n");
+				return 50;
+			}
+			else
+			{
+				printf("回答错误，智商-1\n");
+				return 0;
+			}
+		}
+	}
+	//减
+	else if (rand_fuhao == 1)
+	{
+		while (flag) {
+			if (rand_num1 - rand_num2 >= 0)
+			{
+				flag = 0;
+			}
+			else
+			{
+				rand_num2 = rand() % 101;
+				rand_num1 = rand() % 101;
+			}
+		}
+
+		printf("%d - %d = ?\n", rand_num1, rand_num2);
+		//得到答案并判断得分
+		printf("答案为：");
+		scanf("%d", &answer);
+
+		if (answer == rand_num1 - rand_num2)
+		{
+			printf("回答正确，智商+1！\n");
+			return 100;
+		}
+		else
+		{
+			int a, b, c;
+			char x, y;
+			a = rand_num1; b = rand_num2; c = rand_num1 - rand_num2; x = '-'; y = '=';
+			wrong_question(a, b, c, x, y);
+			printf("回答错误，还有一次机会！\n你的罪恶已经记录\n答案为：");
+			scanf("%d", &answer);
+			if (answer == rand_num1 - rand_num2)
+			{
+				printf("回答正确，智商+0.5！\n");
+				return 50;
+			}
+			else
+			{
+				printf("回答错误，智商-1\n");
+				return 0;
+			}
+		}
+	}
+	//乘
+	else if (rand_fuhao == 2)
+	{
+		while (flag)
+		{
+			if (rand_num1 * rand_num2 < 100)
+			{
+				flag = 0;
+			}
+			else
+			{
+				rand_num2 = rand() % 101;
+				rand_num1 = rand() % 101;
+			}
+		}
+
+		printf("%d * %d = ?\n", rand_num1, rand_num2);
+		//得到答案并判断得分
+		printf("答案为：");
+		scanf("%d", &answer);
+		if (answer == rand_num1 * rand_num2)
+		{
+			printf("回答正确，智商+1！\n");
+			return 100;
+		}
+		else
+		{
+			int a, b, c;
+			char x, y;
+			a = rand_num1; b = rand_num2; c = rand_num1 * rand_num2; x = '*'; y = '=';
+			wrong_question(a, b, c, x, y);
+			printf("回答错误，还有一次机会！\n你的罪恶已经记录\n答案为：");
+			scanf("%d", &answer);
+			if (answer == rand_num1 * rand_num2)
+			{
+				printf("回答正确，智商+0.5！\n");
+				return 50;
+			}
+			else
+			{
+				printf("回答错误，智商-1\n");
+				return 0;
+			}
+		}
+	}
+	//除
+	else
+	{
+		while (flag)
+		{
+			if (rand_num2 != 0 && rand_num1 + rand_num2 <= 100&&( rand_num1%rand_num2==0|| rand_num2% rand_num1==0))
+			{
+				flag = 0;
+			}
+			else
+			{
+				rand_num2 = rand() % 101;
+				rand_num1 = rand() % 101;
+			}
+		}
+
+		printf("%d / %d = ?\n", rand_num1, rand_num2);
+		//得到答案并判断得分
+		printf("答案为：");
+		scanf("%d", &answer);
+		if (answer == rand_num1 / rand_num2)
+		{
+			printf("回答正确，智商+1！\n");
+			return 100;
+		}
+		else
+		{
+			int a, b, c;
+			char x, y;
+			a = rand_num1; b = rand_num2; c = rand_num1 / rand_num2; x = '/'; y = '=';
+			wrong_question(a,b,c,x,y);
+			
+			printf("回答错误，还有一次机会！\n你的罪恶已经记录\n答案为：");
+			scanf("%d", &answer);
+			if (answer == rand_num1 / rand_num2)
+			{
+				printf("回答正确，智商+0.5！\n");
+				return 50;
+			}
+			else
+			{
+				printf("回答错误，智商-1\n");
+				return 0;
+			}
+		}
+
+	}
+
+
+
+}
+
+void wrong_question(int a, int b, int c, char x, char y)
+{
+	FILE *fp;
+	if ((fp = fopen(zhanggh, "ab")) == NULL)
+	{
+		printf("错题本打开错误！\n");
+	}
+
+	fprintf(fp, "%d %c %d %c %d %c", a,x,b,y,c,'\0');
+
+	fclose(fp);
+}
+//根据得分输出
+void mark_shuchu(float score_sum)
+{
+	printf("我的得分是：%.2f\n", score_sum);
+	printf("我应该得到的评价是：\n");
+	if (score_sum >= 90)
+	{
+		printf("SMART\n");
+	}
+	if (score_sum < 90 && score_sum >= 80)
+	{
+		printf("GOOD\n");
+	}
+	if (score_sum < 80 && score_sum >= 70)
+	{
+		printf("OK\n");
+	}
+	if (score_sum < 70 && score_sum >= 60)
+	{
+		printf("PASS\n");
+	}
+	if (score_sum < 60)
+	{
+		printf("TRY AGAIN\n");
+	}
+	system("pause");
+}
+void save_zhuce(struct zhanghao zhmm)
+{
+	FILE *fp;
+	char sp[40];
+	int j, i;
+	if ((fp = fopen("zhuce.txt", "ab")) == NULL)
+	{
+		printf("打开失败！！！");
+	}
+	printf("打开成功\n");
+	j = sprintf(sp, zhmm.haoma);
+	sp[strlen(zhmm.haoma)] = 13;
+	for (int i = strlen(zhmm.haoma) + 1; i < sizeof(zhmm.haoma); i++)
+	{
+		sp[i] = '0';
+	}
+	j += sprintf(sp + sizeof(zhmm.haoma), zhmm.mima);
+	sp[strlen(zhmm.mima) + sizeof(zhmm.haoma)] = 13;
+	for (int i = strlen(zhmm.mima) + sizeof(zhmm.haoma) + 1; i < sizeof(p); i++)
+	{
+		sp[i] = '0';
+	}
+	//spritf用数组保存
+	if (fwrite(sp, sizeof(struct zhanghao), 1, fp) != 1)
+	{
+		printf("保存错误！\n");
+	}
+	fclose(fp);
+}
+void load_cuoti()//加载并显示错题
+{
+	FILE* fp;
+	char cuot[6] = { 0 };
+	int a, b, c;
+	char x, y, z;
+	if ((fp = fopen(zhanggh, "rb")) == NULL)
+	{
+		printf("错题本加载错误！");
+		system("pause");
+	}
+	int res = fscanf(fp, "%d %c %d %c %d %c", &a, &x, &b, &y, &c, &z);
+	printf("%d %c %d %c %d %c\n", a, x, b, y, c, z);
+	if (res == EOF)return;
+	while (!feof(fp))
+	{	
+		int res = fscanf(fp, "%d %c %d %c %d %c", &a, &x, &b, &y, &c, &z);	
+		if (res == EOF)break;
+		printf("%d %c %d %c %d %c\n", a, x, b, y, c, z);
+
+	}
+	system("pause");
+	fclose(fp);
+}
+int load_zhuce_zhuce(struct zhanghao haoma)//加载读入注册表
+{
+	FILE *fp;
+	char dangqian[sizeof(struct zhanghao)+1] = { 0 };
+	int flag = 0, i,j;
+	char haomaa[sizeof(p.haoma)];
+	if ((fp = fopen("zhuce.txt", "rb")) == NULL)
+	{
+		printf("文件打开错误！！\n");
+		return;
+	}
+	fgets(dangqian, sizeof(struct zhanghao)+1, fp);
+	for (i = 0; dangqian[i] != 13; i++)//haomaa的最后会有换行？？？asc码为13
+	{
+		haomaa[i] = dangqian[i];
+	}
+	haomaa[i] = '\0';
+
+	while (!feof(fp) && strcmp(haomaa, haoma.haoma) != 0) 
+	{
+		for (int m = 0; m < sizeof(p.haoma); m++)
+		{
+
+			haomaa[m] = 0;
+		}
+		fgets(dangqian, sizeof(struct zhanghao)+1, fp);
+		for (i = 0; dangqian[i] != 13; i++)
+		{
+			haomaa[i] = dangqian[i];
+		}
+		haomaa[i] = '\0';
+	}
+	  if (strcmp(haomaa, haoma.haoma) != 0)//无账号，可注册
+	 {
+
+		 return 0;
+	 }
+
+
+	 else 
+	 {
+		 return 1;
+	 }
+
+
+
+
+}
+int load_zhuce_denglu(struct zhanghao haoma)//加载读入注册表
+{
+	FILE *fp;
+	char dangqian[sizeof(struct zhanghao)+1];
+	int flag = 0, i, j;
+	char haomaa[sizeof(p.haoma)] = { 0 }, mimaa[sizeof(p.mima)] = { 0 };
+	if ((fp = fopen("zhuce.txt", "rb")) == NULL)
+	{
+		printf("文件打开错误！！\n");
+		return;
+	}
+	fgets(dangqian, sizeof(struct zhanghao)+1, fp);
+	for (i = 0; dangqian[i] != 13; i++)//haomaa的最后会有换行？？？asc码为13
+	{
+		haomaa[i] = dangqian[i];
+	}
+	haomaa[i] = '\0';
+	for (i = 20, j = 0; dangqian[i] != 13; i++, j++)//
+	{
+		mimaa[j] = dangqian[i];
+
+	}
+	mimaa[j] = '\0';
+	while (!feof(fp) && (strcmp(haomaa, haoma.haoma) != 0 || strcmp(mimaa, haoma.mima) != 0))
+	{
+		for (int m = 0; m < sizeof(p.haoma); m++)
+		{
+
+			haomaa[m] = 0;
+		}
+		for (int m = 0; m < sizeof(p.mima); m++)
+		{
+
+			mimaa[m] = 0;
+		}
+		fgets(dangqian, sizeof(struct zhanghao)+1, fp);
+		for (i = 0; dangqian[i] != 13; i++)
+		{
+			haomaa[i] = dangqian[i];
+		}
+		haomaa[i] = '\0';
+		for (i = 20, j = 0; dangqian[i] != 13; i++, j++)
+		{
+			mimaa[j] = dangqian[i];
+		}
+		mimaa[j] = '\0';
+	}
+	if (strcmp(haomaa, haoma.haoma) == 0 && strcmp(mimaa, haoma.mima) == 0)//同时正确，可登陆
+	{
+		return 1;
+	}
+
+
+	else //不可注册也不可登陆
+	{
+		return 0;
+	}
+
+	//strcmp(haomaa, haoma.haoma) != 0    strcmp(mimaa, haoma.mima) != 0
+
+
+}
+//打印菜单,返回功能
+int caidan1()
+{
+	int a;
+	printf("输入相应数字选择所需功能：\n");
+	printf("1.注册\n2.登陆\n3.退出系统\n");
+	scanf("%d", &a);
+	system("cls");
+	if (a <= 0 || a > 3)
+	{
+		printf("该功能正在研发中，敬请期待！");
+		return 0;
+
+	}
+	else
+	{
+
+		return a;
+
+	}
+
+
+
+
+}
+int caidan2()
+{
+	int a;
+	printf("输入相应数字选择所需功能：\n");
+	printf("1.做题\n2.错题本\n3.退出系统\n");
+	scanf("%d", &a);
+	system("cls");
+	if (a <= 0 || a > 3)
+	{
+		printf("该功能正在研发中，敬请期待！");
+		return 0;
+
+	}
+	else
+	{
+
+		return a;
+
+	}
+
+
+}
